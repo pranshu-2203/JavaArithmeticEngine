@@ -5,7 +5,7 @@ import java.util.*;
 public class Tokenizer {
 
     static boolean isOperator(char ch) {
-        return ch == '+' || ch== '-' || ch == '*' || ch == '/' || ch == '^';
+        return ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^';
     }
 
     static boolean isUnaryMinus(String s, int i) {
@@ -44,20 +44,32 @@ public class Tokenizer {
             }
 
             if (Character.isDigit(c) || c == '.' || isUnaryMinus(s, i)) {
-                StringBuilder sb = new StringBuilder();
-                if (isUnaryMinus(s, i)) {
-                    sb.append('-');
+                int unaryCount = 0;
+
+                // Count consecutive unary minuses
+                while (isUnaryMinus(s, i)) {
+                    unaryCount++;
                     i++;
                 }
-                boolean hasDigits = false;
+
+                // Parse the number part
+                StringBuilder sb = new StringBuilder();
                 while (i < s.length() && (Character.isDigit(s.charAt(i)) || s.charAt(i) == '.')) {
                     sb.append(s.charAt(i));
                     i++;
-                    hasDigits = true;
                 }
-                if (!hasDigits)
+
+                if (sb.length() == 0) {
                     throw new RuntimeException("Invalid unary minus without number");
-                list.add(new Token(Double.parseDouble(sb.toString())));
+                }
+
+                double value = Double.parseDouble(sb.toString());
+
+                // Apply unary minus if odd count
+                if (unaryCount % 2 != 0)
+                    value = -value;
+
+                list.add(new Token(value));
                 continue;
             }
 

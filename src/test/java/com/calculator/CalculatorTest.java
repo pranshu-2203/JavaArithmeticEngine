@@ -54,10 +54,6 @@ public class CalculatorTest {
         assertEquals(7.5, evaluator.eval("3.5+4.0"));
     }
 
-    @Test
-    public void testComplexExpression() {
-        assertEquals(3, evaluator.eval("2 + 3 * 4 / 6"));
-    }
 
     @Test
     public void testExponentWithParentheses() {
@@ -78,7 +74,6 @@ public class CalculatorTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             evaluator.eval("");
         });
-        // tokenizer will throw index error
         assertNotNull(exception.getMessage());
     }
 
@@ -90,23 +85,28 @@ public class CalculatorTest {
         assertNotNull(exception.getMessage());
     }
 
-    @Test
-    public void testDivisionByZero() {
-        Exception exception = assertThrows(ArithmeticException.class, () -> {
-            evaluator.eval("5/0");
-        });
-    }
-
-    @Test
-    public void testMultipleUnaryMinus() {
-        assertEquals(5, evaluator.eval("--5"));
-        assertEquals(-5, evaluator.eval("---5"));
-    }
+    
 
     @Test
     public void testOperatorPrecedence() {
         assertEquals(11, evaluator.eval("2+3*3"));
         assertEquals(15, evaluator.eval("(2+3)*3"));
+    }
+
+    @Test
+    public void testComplexExpression() {
+        assertEquals(14.0, evaluator.eval("(2 + 3) * 4 - 6"), 0.0001);
+    }
+
+    @Test
+    public void testDivisionByZero() {
+        assertThrows(ArithmeticException.class, () -> evaluator.eval("5 / 0"));
+    }
+
+    @Test
+    public void testMultipleUnaryMinus() {
+        assertEquals(5.0, evaluator.eval("--5"), 0.0001);
+        assertEquals(-5.0, evaluator.eval("---5"), 0.0001);
     }
 
 }

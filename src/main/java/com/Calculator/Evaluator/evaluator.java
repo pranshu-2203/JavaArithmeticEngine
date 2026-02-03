@@ -45,54 +45,56 @@ public class evaluator {
     }
 
     public static double eval(String input) {
-        if (input == null || input.trim().isEmpty())
-            throw new RuntimeException("Input is empty");
-
         List<Token> tokens = Tokenizer.tokenize(input);
-        if (tokens.isEmpty())
-            throw new RuntimeException("No valid tokens found");
-
         Stack<Double> nums = new Stack<>();
         Stack<Character> ops = new Stack<>();
 
-        for (Token T : tokens) {
-            if (T.type == Token.Type.NUMBER) {
-                nums.push(T.value);
-            } else if (T.type == Token.Type.LPAREN) {
-                ops.push('(');
-            } else if (T.type == Token.Type.RPAREN) {
-                boolean foundParen = false;
-                while (!ops.isEmpty()) {
-                    char op = ops.pop();
-                    if (op == '(') {
-                        foundParen = true;
-                        break;
-                    } else {
-                        apply(nums, op);
+        for (Token t : tokens) {
+            switch (t.type) {
+                case NUMBER:
+                    nums.push(t.value);
+                    break;
+
+                case LPAREN:
+                    ops.push('(');
+                    break;
+
+                case RPAREN:
+                    while (!ops.isEmpty() && ops.peek() != '(') {
+                        apply(nums, ops.pop());
                     }
-                }
-                if (!foundParen)
-                    throw new RuntimeException("Unmatched parentheses");
-            } else if (T.type == Token.Type.OPERATOR) {
-                char ch = T.op;
-                while (!ops.isEmpty() && ops.peek() != '(' &&
-                        (priority(ops.peek()) > priority(ch) ||
-                                (priority(ops.peek()) == priority(ch) && !rightAssoc(ch))))
-                    apply(nums, ops.pop());
-                ops.push(ch);
+                    if (ops.isEmpty())
+                        throw new RuntimeException("Mismatched parentheses");
+                    ops.pop();
+                    break;
+
+                case OPERATOR:
+                    char currentOp = t.op;
+                    while (!ops.isEmpty() && ops.peek() != '(') {
+                        char topOp = ops.peek();
+                        // Apply top operator if it has higher precedence OR same precedence and
+                        // left-associative
+                        if (priority(topOp) > priority(currentOp) ||
+                                (priority(topOp) == priority(currentOp) && !rightAssoc(currentOp))) {
+                            apply(nums, ops.pop());
+                        } else {
+                            break;
+                        }
+                    }
+                    ops.push(currentOp);
+                    break;
             }
         }
 
         while (!ops.isEmpty()) {
-            char op = ops.pop();
-            if (op == '(')
-                throw new RuntimeException("Unmatched parentheses");
-            apply(nums, op);
+            if (ops.peek() == '(' || ops.peek() == ')')
+                throw new RuntimeException("Mismatched parentheses");
+            apply(nums, ops.pop());
         }
 
         if (nums.size() != 1)
             throw new RuntimeException("Invalid expression");
-
         return nums.pop();
     }
+
 }
