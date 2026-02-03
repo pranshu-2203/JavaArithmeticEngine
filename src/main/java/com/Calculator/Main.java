@@ -10,7 +10,6 @@ public class Main {
 
         System.out.println("*****Welcome to Expression Calculator******\n         Please Press Enter\n if you want to exit calculator wite exit");
         Scanner sc = new Scanner(System.in);
-        String input=sc.nextLine();
         while(true){
             System.out.print("Enter expression: ");
             String exp = sc.nextLine();
