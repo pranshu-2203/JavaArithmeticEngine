@@ -1,6 +1,11 @@
 # Compiled class file
 *.class
 
+# Ignore all jars EXCEPT lib jars
+*.jar
+!lib/*.jar
+
+
 # Log file
 *.log
 
